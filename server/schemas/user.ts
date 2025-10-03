@@ -2,7 +2,7 @@ import mongoose, { Schema } from 'mongoose'
 
 const userSchema = new Schema(
   {
-    username: {
+    name: {
       type: String,
       required: true,
       unique: true,
@@ -12,11 +12,10 @@ const userSchema = new Schema(
       required: true,
       unique: true,
     },
-    email_verified: {
-      type: Number,
-    },
+    emailVerified: { type: Date },
+    image: String,
   },
   { timestamps: true }, // Automatically create createdAt and updatedAt fields
 )
 
-export default mongoose.model('user', userSchema)
+export default mongoose.model('User', userSchema)

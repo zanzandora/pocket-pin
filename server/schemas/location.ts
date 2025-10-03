@@ -22,7 +22,7 @@ const locationSchema = new Schema(
       type: Number,
       required: true,
     },
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: 'user',
       required: true,
@@ -31,4 +31,4 @@ const locationSchema = new Schema(
   { timestamps: true }, // Automatically create createdAt and updatedAt fields});
 )
 
-export default mongoose.model('location', locationSchema)
+export default mongoose.model('Location', locationSchema)

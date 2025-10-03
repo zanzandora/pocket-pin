@@ -27,16 +27,16 @@ const locationLogSchema = new Schema(
     },
     location: {
       type: Schema.Types.ObjectId,
-      ref: 'location',
+      ref: 'Location',
       required: true,
     },
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'User',
       required: true,
     },
   },
   { timestamps: true }, // Automatically create createdAt and updatedAt fields});
 )
 
-export default mongoose.model('location-log', locationLogSchema)
+export default mongoose.model('LocationLog', locationLogSchema)

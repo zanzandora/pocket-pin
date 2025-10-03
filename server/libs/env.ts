@@ -5,7 +5,11 @@ import tryParseEnv from './try-parse-env'
 const envSchema = z.object({
   PORT: z.string().default('3000').transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']),
-  MONGODB_URI: z.string().url(),
+  MONGODB_URI: z.url(),
+  AUTH_ORIGIN: z.url(),
+  NUXT_AUTH_SECRET: z.string(),
+  GITHUB_CLIENT_ID: z.string(),
+  GITHUB_CLIENT_SECRET: z.string(),
 })
 
 tryParseEnv(envSchema)

@@ -11,21 +11,21 @@ const locationLogImageSchema = new Schema(
     },
     location_log: {
       type: Schema.Types.ObjectId,
-      ref: 'location-log',
+      ref: 'LocationLog',
       required: true,
     },
     location: {
       type: Schema.Types.ObjectId,
-      ref: 'location',
+      ref: 'Location',
       required: true,
     },
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
-      ref: 'user',
+      ref: 'User',
       required: true,
     },
   },
   { timestamps: true }, // Automatically create createdAt and updatedAt fields});
 )
 
-export default mongoose.model('location-log-image', locationLogImageSchema)
+export default mongoose.model('LocationLogImage', locationLogImageSchema)
