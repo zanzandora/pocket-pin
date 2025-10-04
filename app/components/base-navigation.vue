@@ -2,11 +2,7 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 
 const items = ref<NavigationMenuItem[]>([
-  {
-    label: 'About',
-    icon: 'i-lucide-book-open',
-    to: '/about',
-  },
+  { label: 'About', icon: 'i-lucide-book-open', to: '/about' },
   {
     label: 'Composables',
     icon: 'i-lucide-database',
@@ -35,8 +31,6 @@ const items = ref<NavigationMenuItem[]>([
   {
     label: 'Components',
     icon: 'i-lucide-box',
-    // to: '/components',
-    // active: true,
     children: [
       {
         label: 'Link',
@@ -84,30 +78,28 @@ const items = ref<NavigationMenuItem[]>([
     to: 'https://github.com/nuxt/ui',
     target: '_blank',
   },
-  {
-    label: 'Help',
-    icon: 'i-lucide-circle-help',
-    disabled: true,
-  },
+  { label: 'Help', icon: 'i-lucide-circle-help', disabled: true },
 ])
 </script>
 
 <template>
   <UHeader
-    :toggle="{
-      color: 'primary',
-      variant: 'subtle',
-      class: 'rounded-full',
-    }"
+    :toggle="{ color: 'primary', variant: 'subtle', class: 'rounded-full' }"
   >
     <template #title>
-      <NuxtImg width="56px" src="/icon-green.png" format="webp" alt="" />
+      <NuxtImg
+        width="56px"
+        src="/icon-green.png"
+        format="webp"
+        alt="Travel Log"
+      />
     </template>
 
     <UNavigationMenu :items="items" class="text-xl" />
 
     <template #right>
       <UColorModeSwitch />
+      <AuthButton />
     </template>
   </UHeader>
 </template>

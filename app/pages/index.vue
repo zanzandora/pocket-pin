@@ -16,8 +16,8 @@ const links = ref([
 
 <template>
   <UPageHero
-    title="Ultimate Vue UI library"
-    description="A Nuxt/Vue-integrated UI library providing a rich set of fully-styled, accessible and highly customizable components for building modern web applications."
+    title="Travle Log"
+    description="Keep track of your travels and adventures with Travel Log, the ultimate travel journaling app. Add locations, photos, and notes to create a digital journal of your journeys."
     :links="links"
   />
 </template>
