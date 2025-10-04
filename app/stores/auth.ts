@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', () => {
   async function logout() {
     try {
       actionLoading.value = true
-      await signOut({ callbackUrl: window.location.pathname || '/' })
+      await signOut({ callbackUrl: '/' })
       await getSession()
     } catch (err) {
       console.error('signOut error', err)

@@ -8,8 +8,8 @@ const envSchema = z.object({
   MONGODB_URI: z.url(),
   AUTH_ORIGIN: z.url(),
   NUXT_AUTH_SECRET: z.string(),
-  GITHUB_CLIENT_ID: z.string(),
-  GITHUB_CLIENT_SECRET: z.string(),
+  AUTH_GITHUB_CLIENT_ID: z.string(),
+  AUTH_GITHUB_CLIENT_SECRET: z.string(),
 })
 
 tryParseEnv(envSchema)
