@@ -1,4 +1,7 @@
 <script setup lang="ts">
+definePageMeta({
+  auth: { unauthenticatedOnly: true },
+})
 const route = useRoute()
 
 // Lấy query param ?error=...

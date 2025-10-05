@@ -2,14 +2,8 @@
 const links = ref([
   {
     label: 'Get started',
-    to: '/docs/getting-started',
+    to: '/dashboard',
     icon: 'i-lucide-square-play',
-  },
-  {
-    label: 'Learn more',
-    to: '/docs/getting-started/theme/design-system',
-    variant: 'subtle' as const,
-    trailingIcon: 'i-lucide-arrow-right',
   },
 ])
 </script>

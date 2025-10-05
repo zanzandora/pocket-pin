@@ -38,5 +38,8 @@ export default defineNuxtConfig({
     provider: {
       authjs: {},
     },
+    pages: {
+      error: '/error',
+    },
   },
 })
