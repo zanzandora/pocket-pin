@@ -22,7 +22,7 @@ const items = computed<DropdownMenuItem[]>(() => [
       <UButton
         :disabled="authStore.actionLoading || authStore.status === 'loading'"
         icon="i-grommet-icons:github"
-        loading-auto
+        :loading="authStore.actionLoading"
         @click="authStore.login('github')"
       >
         <span v-if="authStore.actionLoading">Loading...</span>

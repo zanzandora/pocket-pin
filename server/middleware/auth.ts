@@ -29,7 +29,6 @@ export default defineEventHandler(async (event) => {
     session = null
   }
 
-  console.warn('session: ', session)
   if (!session) {
     return sendRedirect(event, '/', 302)
   }
