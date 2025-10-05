@@ -5,5 +5,9 @@ definePageMeta({
 </script>
 
 <template>
-  <div>Dashboard Page</div>
+  <UDashboardGroup>
+    <DashboardSidebar />
+
+    <slot />
+  </UDashboardGroup>
 </template>
