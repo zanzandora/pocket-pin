@@ -1,112 +1,66 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
 
+const route = useRoute()
+const router = useRouter()
+
 const items: NavigationMenuItem[][] = [
   [
     {
-      label: 'Home',
+      label: 'Location',
       icon: 'i-lucide-house',
-      active: true,
+      path: '/dashboard/location',
+      active: false,
     },
     {
-      label: 'Inbox',
+      label: 'Add Location',
       icon: 'i-lucide-inbox',
-      badge: '4',
-    },
-    {
-      label: 'Contacts',
-      icon: 'i-lucide-users',
-    },
-    {
-      label: 'Settings',
-      icon: 'i-lucide-settings',
-      defaultOpen: true,
-      children: [
-        {
-          label: 'General',
-        },
-        {
-          label: 'Members',
-        },
-        {
-          label: 'Notifications',
-        },
-      ],
-    },
-  ],
-  [
-    {
-      label: 'Feedback',
-      icon: 'i-lucide-message-circle',
-      to: 'https://github.com/nuxt-ui-templates/dashboard',
-      target: '_blank',
-    },
-    {
-      label: 'Help & Support',
-      icon: 'i-lucide-info',
-      to: 'https://github.com/nuxt/ui',
-      target: '_blank',
+      path: '/dashboard/add',
+      active: false,
     },
   ],
 ]
+
+const goTo = (path?: string) => {
+  if (path) router.push(path)
+}
 </script>
 
 <template>
   <UDashboardSidebar
     collapsible
     resizable
-    :ui="{ footer: 'border-t border-default' }"
+    :ui="{
+      footer: 'border-t border-default',
+      header: 'hidden',
+      body: 'flex-none',
+    }"
   >
-    <template #header="{ collapsed }">
-      <Logo v-if="!collapsed" class="h-5 w-auto shrink-0" />
-      <UIcon
-        v-else
-        name="i-simple-icons-nuxtdotjs"
-        class="text-primary mx-auto size-5"
-      />
-    </template>
-
     <template #default="{ collapsed }">
-      <UButton
-        :label="collapsed ? undefined : 'Search...'"
-        icon="i-lucide-search"
-        color="neutral"
-        variant="outline"
-        block
-        :square="collapsed"
-      >
-        <template v-if="!collapsed" #trailing>
-          <div class="ms-auto flex items-center gap-0.5">
-            <UKbd value="meta" variant="subtle" />
-            <UKbd value="K" variant="subtle" />
-          </div>
-        </template>
-      </UButton>
-
       <UNavigationMenu
+        v-for="(item, index) in items"
+        :key="index"
         :collapsed="collapsed"
-        :items="items[0]"
+        :items="
+          item?.map((item) => ({
+            ...item,
+            active: route.path === item.path,
+            onClick: () => goTo(item.path),
+          }))
+        "
         orientation="vertical"
-      />
-
-      <UNavigationMenu
-        :collapsed="collapsed"
-        :items="items[1]"
-        orientation="vertical"
-        class="mt-auto"
       />
     </template>
 
     <template #footer="{ collapsed }">
       <UButton
-        :avatar="{
-          src: 'https://github.com/benjamincanac.png',
-        }"
-        :label="collapsed ? undefined : 'Benjamin'"
+        icon="i-heroicons-outline:logout"
+        :label="collapsed ? undefined : 'Sign Out'"
         color="neutral"
         variant="ghost"
-        class="w-full"
+        class="text-error w-full transition-all duration-300 ease-in-out"
         :block="collapsed"
+        @click="goTo('/sign-out')"
       />
     </template>
   </UDashboardSidebar>

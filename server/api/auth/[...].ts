@@ -13,4 +13,13 @@ export default NuxtAuthHandler({
       clientSecret: env.AUTH_GITHUB_CLIENT_SECRET!,
     }),
   ],
+  callbacks: {
+    async session({ session, user }) {
+      // Thêm id của user vào session
+      if (user && session.user) {
+        session.user._id = user.id || user._id?.toString()
+      }
+      return session
+    },
+  },
 })

@@ -13,6 +13,9 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@sidebase/nuxt-auth',
     '@pinia/nuxt',
+    '@nuxt/icon',
+    '@vee-validate/nuxt',
+    'nuxt-csurf',
   ],
 
   css: ['~/app/assets/css/main.css'],
@@ -40,6 +43,16 @@ export default defineNuxtConfig({
     },
     pages: {
       error: '/error',
+    },
+  },
+
+  csurf: {
+    addCsrfTokenToEventCtx: true,
+  },
+
+  routeRules: {
+    '/api/auth/**': {
+      csurf: false,
     },
   },
 })

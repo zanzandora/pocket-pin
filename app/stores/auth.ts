@@ -7,9 +7,7 @@ export const useAuthStore = defineStore('auth', () => {
   const { status, data, getSession, signIn, signOut } = useAuth()
 
   const actionLoading = ref(false)
-  const isAuthenticated = computed(
-    () => !!(data.value && (data.value as any).user),
-  )
+  const isAuthenticated = computed(() => status.value === 'authenticated')
 
   // --- Login / Logout ---
   async function login(provider = 'github') {
