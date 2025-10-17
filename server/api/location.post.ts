@@ -35,6 +35,18 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const exitedLocation = await locationSchema.findOne({
+    userId: event.context.user.id,
+    name: result.data.name,
+  })
+
+  if (exitedLocation) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'The location already exits !',
+    })
+  }
+
   let slug = result.data.name
     .toString()
     .toLowerCase()

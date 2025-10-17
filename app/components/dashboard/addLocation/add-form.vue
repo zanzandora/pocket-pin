@@ -52,6 +52,7 @@ const submitForm = handleSubmit(async (data) => {
     toast.add({
       title: 'Error',
       description: err.statusMessage || 'An error occurred.',
+      color: 'error',
     })
   }
 })

@@ -24,7 +24,7 @@ export default defineEventHandler(async (event) => {
   let session = null
   try {
     session = await getServerSession(event)
-    console.warn('session:', session)
+    // console.warn('session:', session)
     if (session?.user?._id) {
       // Đơn giản: gán thẳng session.user vào context
       event.context.user = {
