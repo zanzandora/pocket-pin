@@ -158,7 +158,6 @@ onBeforeRouteLeave(() => {
         class="px-6 py-2"
         icon="i-lucide:corner-up-left"
         :disabled="isSubmitting"
-        :loading="isSubmitting"
         @click="router.push('/dashboard')"
       >
         Cancel
@@ -170,6 +169,7 @@ onBeforeRouteLeave(() => {
         trailing-icon="i-lucide:circle-plus"
         :disabled="isSubmitting"
         :loading="isSubmitting"
+        :trailing="true"
       >
         Add Location
       </UButton>

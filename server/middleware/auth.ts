@@ -33,7 +33,7 @@ export default defineEventHandler(async (event) => {
         email: session.user.email,
         image: session.user.image,
       }
-      console.warn('✅ User set in context:', event.context.user)
+      // console.warn('✅ User set in context:', event.context.user)
     } else {
       console.warn('❌ No session or user id found')
       return sendRedirect(event, '/', 302)

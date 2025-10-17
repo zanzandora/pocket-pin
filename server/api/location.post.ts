@@ -1,7 +1,11 @@
 import { insertLocationSchema } from '@@/shared/schemas/insert-location'
 
+import {
+  findLocationByName,
+  getUniqueSlug,
+  insertedLocation,
+} from '../controllers/location.controller'
 import connectDB from '../libs/db'
-import locationSchema from '../schemas/location'
 
 export default defineEventHandler(async (event) => {
   if (!event.context.user) {
@@ -35,10 +39,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const exitedLocation = await locationSchema.findOne({
-    userId: event.context.user.id,
-    name: result.data.name,
-  })
+  const exitedLocation = await findLocationByName(
+    result.data,
+    event.context.user.id,
+  )
 
   if (exitedLocation) {
     throw createError({
@@ -47,28 +51,21 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  let slug = result.data.name
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\W+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  const slug = await getUniqueSlug(result.data.name)
 
-  let counter = 1
+  try {
+    const newLocation = await insertedLocation(
+      result.data,
+      event.context.user.id,
+      slug,
+    )
 
-  // Kiểm tra trùng lặp slug trong database
-  while (await locationSchema.exists({ slug })) {
-    slug = `${slug}-${counter}`
-    counter++
+    return { statusCode: 200, success: true, data: newLocation }
+  } catch (error) {
+    console.error('Error inserting location:', error)
+    throw createError({
+      statusCode: 422,
+      statusMessage: 'something wrong',
+    })
   }
-
-  // eslint-disable-next-line new-cap
-  const newLocation = new locationSchema({
-    ...result.data,
-    userId: event.context.user.id,
-    slug,
-  })
-  await newLocation.save()
-
-  return { statusCode: 200, success: true, data: newLocation }
 })
