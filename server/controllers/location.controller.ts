@@ -2,6 +2,7 @@ import type { InsertLocationInput } from '~~/shared/schemas/insert-location'
 
 import LocationSchema from '../schemas/location'
 
+// TODO: fine location by name
 export async function findLocationByName(
   existing: InsertLocationInput,
   userId: string,
@@ -12,6 +13,7 @@ export async function findLocationByName(
   })
 }
 
+// TODO: get unique slug
 export async function getUniqueSlug(name: string) {
   let slug = name
     .toString()
@@ -30,6 +32,7 @@ export async function getUniqueSlug(name: string) {
   return slug
 }
 
+// TODO: Insert location
 export async function insertedLocation(
   data: InsertLocationInput,
   userId: string,
@@ -43,4 +46,24 @@ export async function insertedLocation(
   await newLocation.save()
 
   return newLocation
+}
+
+// TODO: Get all locations
+export async function getAllLocations(userId: string) {
+  const locations = await LocationSchema.find({ userId }).sort({
+    createdAt: -1,
+  })
+
+  if (locations.length === 0) {
+    return { statusCode: 404, success: false, data: [] }
+  }
+
+  return locations
+}
+
+// TODO: Get a location
+export async function findLocation(userId: string) {
+  const location = await LocationSchema.findOne({ userId })
+
+  return location
 }

@@ -51,7 +51,8 @@ const submitForm = handleSubmit(async (data) => {
     console.error('Error inserting location:', error)
     toast.add({
       title: 'Error',
-      description: err.statusMessage || 'An error occurred.',
+      description:
+        err.data?.statusMessage || err.statusMessage || 'An error occurred.',
       color: 'error',
     })
   }

@@ -9,7 +9,7 @@ const items: NavigationMenuItem[][] = [
     {
       label: 'Location',
       icon: 'i-lucide-house',
-      path: '/dashboard/location',
+      path: '/dashboard',
       active: false,
     },
     {

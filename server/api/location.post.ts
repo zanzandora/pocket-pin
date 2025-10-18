@@ -6,15 +6,9 @@ import {
   insertedLocation,
 } from '../controllers/location.controller'
 import connectDB from '../libs/db'
+import { defineAuthenticatedEventHandle } from '../libs/utils'
 
-export default defineEventHandler(async (event) => {
-  if (!event.context.user) {
-    throw createError({
-      statusCode: 401,
-      statusMessage: 'Unauthorized',
-    })
-  }
-
+export default defineAuthenticatedEventHandle(async (event) => {
   await connectDB()
 
   const result = await readValidatedBody(event, insertLocationSchema.safeParse)
