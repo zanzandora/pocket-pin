@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import type { ApiResponeType } from '~/types/api-respone.type'
-import type { LocationType } from '~/types/location.type'
-
 const links = ref([
   {
     label: 'Add Location',
@@ -9,20 +6,33 @@ const links = ref([
     icon: 'i-lucide-circle-plus',
   },
 ])
+const locationStore = useMyLocationsStore()
 
-const { data: locations, pending } = await useFetch<
-  ApiResponeType<LocationType[]>
->('/api/location', {
-  lazy: true,
+const { locations, status } = storeToRefs(locationStore)
+
+onMounted(() => {
+  locationStore.refresh()
 })
 </script>
 
 <template>
   <UMain class="mx-auto mt-8">
-    <div v-if="pending">Loading...</div>
+    <div v-if="status === 'pending'">
+      <UBlogPosts class="gap-6 lg:gap-y-12">
+        <USkeleton
+          v-for="i in 9"
+          :key="i"
+          class="bg-elevated/50 ring-default divide-default w-xs h-32 divide-y overflow-hidden rounded-lg ring"
+        />
+      </UBlogPosts>
+    </div>
 
-    <div v-else-if="locations?.data && locations?.data.length > 0">
-      <UBlogPosts>
+    <div
+      v-if="
+        status !== 'pending' && locations?.data && locations?.data.length > 0
+      "
+    >
+      <UBlogPosts class="gap-6 lg:gap-y-12">
         <UCard
           v-for="(location, index) in locations?.data"
           :key="index"

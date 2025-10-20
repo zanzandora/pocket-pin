@@ -4,22 +4,37 @@ import type { NavigationMenuItem } from '@nuxt/ui'
 const route = useRoute()
 const router = useRouter()
 
-const items: NavigationMenuItem[][] = [
+const sidebarStore = storeToRefs(useMySidebarStore())
+
+onMounted(() => {
+  if (route.path !== '/dashboard') {
+    useMyLocationsStore().refresh()
+  }
+})
+
+const items = computed<NavigationMenuItem[][]>(() => [
   [
     {
       label: 'Location',
       icon: 'i-lucide-house',
-      path: '/dashboard',
-      active: false,
+      to: '/dashboard',
     },
     {
       label: 'Add Location',
       icon: 'i-lucide-inbox',
-      path: '/dashboard/add',
-      active: false,
+      to: '/dashboard/add',
     },
   ],
-]
+  [
+    {
+      label: 'Map Pin',
+      icon: 'i-lucide-map-pin',
+      to: '/dashboard/#',
+      badge: sidebarStore.sidebarItems.value.length,
+      children: sidebarStore.sidebarItems.value,
+    },
+  ],
+])
 
 const goTo = (path?: string) => {
   if (path) router.push(path)
@@ -44,8 +59,7 @@ const goTo = (path?: string) => {
         :items="
           item?.map((item) => ({
             ...item,
-            active: route.path === item.path,
-            onClick: () => goTo(item.path),
+            active: route.path === item.to,
           }))
         "
         orientation="vertical"
