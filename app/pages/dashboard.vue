@@ -5,9 +5,13 @@ definePageMeta({
 </script>
 
 <template>
-  <UDashboardGroup class="mt-16 h-screen">
+  <UDashboardGroup class="mt-16">
     <DashboardSidebar />
 
-    <NuxtPage />
+    <div class="flex flex-1 flex-col">
+      <NuxtPage />
+
+      <DashboardMap class="flex-1" />
+    </div>
   </UDashboardGroup>
 </template>

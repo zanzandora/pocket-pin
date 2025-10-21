@@ -16,7 +16,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UMain class="mx-auto mt-8">
+  <UMain class="min-h-auto mx-2 my-4">
     <div v-if="status === 'pending'">
       <UBlogPosts class="gap-6 lg:gap-y-12">
         <USkeleton
@@ -32,7 +32,7 @@ onMounted(() => {
         status !== 'pending' && locations?.data && locations?.data.length > 0
       "
     >
-      <UBlogPosts class="gap-6 lg:gap-y-12">
+      <!-- <UBlogPosts class="gap-6 lg:gap-y-12">
         <UCard
           v-for="(location, index) in locations?.data"
           :key="index"
@@ -46,7 +46,28 @@ onMounted(() => {
             {{ location?.description || ' There is nothing to desc' }}
           </p>
         </UCard>
-      </UBlogPosts>
+      </UBlogPosts> -->
+
+      <UCarousel
+        v-slot="{ item }"
+        loop
+        wheel-gestures
+        :items="locations?.data"
+        :ui="{ item: 'basis-1/3' }"
+      >
+        <UCard
+          variant="subtle"
+          :ui="{ header: 'sm:px-4 p-2', body: 'sm:px-4 p-2' }"
+        >
+          <template #header>
+            <h1 class="text-xl">{{ item?.name }}</h1>
+          </template>
+
+          <p class="text-sm">
+            {{ item?.description || ' There is nothing to desc' }}
+          </p>
+        </UCard>
+      </UCarousel>
     </div>
 
     <UPageHero

@@ -16,6 +16,7 @@ export default defineNuxtConfig({
     '@nuxt/icon',
     '@vee-validate/nuxt',
     'nuxt-csurf',
+    'nuxt-maplibre',
   ],
 
   css: ['~/app/assets/css/main.css'],
@@ -33,7 +34,15 @@ export default defineNuxtConfig({
       },
     },
     plugins: [tailwindcss()],
+    optimizeDeps: {
+      include: ['typesense-instantsearch-adapter', 'maplibre-gl'],
+    },
   },
+
+  build: {
+    transpile: ['nuxt-maplibre'],
+  },
+
   auth: {
     isEnabled: true,
     baseURL: env.AUTH_ORIGIN || 'http://localhost:3000',
