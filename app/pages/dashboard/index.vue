@@ -17,14 +17,12 @@ onMounted(() => {
 
 <template>
   <UMain class="min-h-auto mx-2 my-4">
-    <div v-if="status === 'pending'">
-      <UBlogPosts class="gap-6 lg:gap-y-12">
-        <USkeleton
-          v-for="i in 9"
-          :key="i"
-          class="bg-elevated/50 ring-default divide-default w-xs h-32 divide-y overflow-hidden rounded-lg ring"
-        />
-      </UBlogPosts>
+    <div v-if="status === 'pending'" class="flex flex-col gap-6 sm:flex-row">
+      <USkeleton
+        v-for="i in 3"
+        :key="i"
+        class="bg-elevated/50 ring-default divide-default h-28 w-full divide-y overflow-hidden rounded-lg ring"
+      />
     </div>
 
     <div
@@ -32,22 +30,6 @@ onMounted(() => {
         status !== 'pending' && locations?.data && locations?.data.length > 0
       "
     >
-      <!-- <UBlogPosts class="gap-6 lg:gap-y-12">
-        <UCard
-          v-for="(location, index) in locations?.data"
-          :key="index"
-          variant="subtle"
-        >
-          <template #header>
-            <h1 class="text-2xl">{{ location?.name }}</h1>
-          </template>
-
-          <p class="text-base">
-            {{ location?.description || ' There is nothing to desc' }}
-          </p>
-        </UCard>
-      </UBlogPosts> -->
-
       <UCarousel
         v-slot="{ item }"
         loop

@@ -6,7 +6,7 @@ export type SideBarItem = {
   to: string
 }
 
-export const useMySidebarStore = defineStore('sidebar', () => {
+export const useMySidebarStore = defineStore('mySidebarStore', () => {
   const sidebarItems = ref<SideBarItem[]>([])
 
   return {

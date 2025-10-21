@@ -3,7 +3,7 @@ import { useAuth } from '#imports'
 import { defineStore } from 'pinia'
 import { computed, onUnmounted, ref } from 'vue'
 
-export const useAuthStore = defineStore('auth', () => {
+export const useAuthStore = defineStore('authStore', () => {
   const { status, data, getSession, signIn, signOut } = useAuth()
 
   const actionLoading = ref(false)
