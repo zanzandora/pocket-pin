@@ -1,9 +1,10 @@
 export type LatLonItemType = {
-  lat: number
-  long: number
+  latitude: number
+  longitude: number
 }
 
 export type MapType = {
-  id: number
-  label: string
+  _id?: number
+  name: string
+  description?: string
 } & LatLonItemType

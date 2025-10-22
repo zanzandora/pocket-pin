@@ -21,8 +21,8 @@ onMounted(() => {
     <MglNavigationControl />
     <MglMarker
       v-for="point in mapStore.mapPoints"
-      :key="point.id"
-      :coordinates="[point.long, point.lat]"
+      :key="point._id"
+      :coordinates="[point.longitude, point.latitude]"
     >
       <template #marker>
         <UTooltip
@@ -31,11 +31,29 @@ onMounted(() => {
             side: 'top',
             sideOffset: 8,
           }"
-          :text="point.label"
+          :delay-duration="0"
+          :text="point.name"
         >
-          <UIcon class="text-2xl text-pink-500" name="i-picon:marker" />
+          <div
+            @mouseenter="mapStore.selectedPoint = point"
+            @mouseleave="mapStore.selectedPoint = null"
+          >
+            <UIcon
+              class="cursor-pointer text-2xl"
+              :class="
+                mapStore.selectedPoint === point
+                  ? 'text-pink-500'
+                  : 'text-secondary'
+              "
+              name="i-picon:marker"
+            />
+          </div>
         </UTooltip>
       </template>
+      <MglPopup>
+        <h1 class="text-xl">{{ point.name }}</h1>
+        <p>{{ point.description || '' }}</p>
+      </MglPopup>
     </MglMarker>
   </MglMap>
 </template>

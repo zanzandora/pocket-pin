@@ -4,6 +4,7 @@ import type { MapType } from '~/types/map.type'
 
 export const useMyMapStore = defineStore('myMapStore', () => {
   const mapPoints = ref<MapType[]>([])
+  const selectedPoint = ref<MapType | null>(null)
 
   // init function to initialize the map with the first point
   // TODO: Map displays with appropriate zoom level
@@ -22,11 +23,11 @@ export const useMyMapStore = defineStore('myMapStore', () => {
 
       const bounds = mapPoints.value.reduce(
         (bounds, point) => {
-          return bounds.extend([point.long, point.lat])
+          return bounds.extend([point.longitude, point.latitude])
         },
         new LngLatBounds(
-          [firstPoint.long, firstPoint.lat],
-          [firstPoint.long, firstPoint.lat],
+          [firstPoint.longitude, firstPoint.latitude],
+          [firstPoint.longitude, firstPoint.latitude],
         ),
       )
 
@@ -39,5 +40,6 @@ export const useMyMapStore = defineStore('myMapStore', () => {
   return {
     init,
     mapPoints,
+    selectedPoint,
   }
 })

@@ -20,15 +20,11 @@ export const useMyLocationsStore = defineStore('myLocationsStore', () => {
       sidebarStore.sidebarItems = locations.value.data.map((location) => ({
         label: location?.name ?? 'Unknown',
         icon: 'i-lucide-map',
-        to: `/dashboard`,
+        to: `/`,
+        _id: location._id,
       }))
 
-      mapStore.mapPoints = locations.value.data.map((location, index) => ({
-        id: index,
-        label: location?.name ?? 'Unknow name',
-        lat: location?.latitude ?? 0,
-        long: location?.longitude ?? 0,
-      }))
+      mapStore.mapPoints = locations.value.data
     }
   })
 

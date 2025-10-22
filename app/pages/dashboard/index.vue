@@ -6,12 +6,12 @@ const links = ref([
     icon: 'i-lucide-circle-plus',
   },
 ])
-const locationStore = useMyLocationsStore()
 
-const { locations, status } = storeToRefs(locationStore)
+const { locations, status } = storeToRefs(useMyLocationsStore())
+const mapStore = useMyMapStore()
 
 onMounted(() => {
-  locationStore.refresh()
+  useMyLocationsStore().refresh()
 })
 </script>
 
@@ -37,23 +37,38 @@ onMounted(() => {
         :items="locations?.data"
         :ui="{ item: 'basis-1/3' }"
       >
-        <UCard
-          variant="subtle"
-          :ui="{ header: 'sm:px-4 p-2', body: 'sm:px-4 p-2' }"
+        <div
+          :key="item._id"
+          class="rounded-lg border-2 transition-colors duration-200"
+          :class="{
+            'border-pink-500': mapStore.selectedPoint?._id === item._id,
+            'border-transparent': mapStore.selectedPoint?._id !== item._id,
+          }"
+          @mouseenter="mapStore.selectedPoint = item"
+          @mouseleave="mapStore.selectedPoint = null"
         >
-          <template #header>
-            <h1 class="text-xl">{{ item?.name }}</h1>
-          </template>
+          <UCard
+            variant="subtle"
+            :ui="{
+              header: 'sm:px-4 p-2',
+              body: 'sm:px-4 p-2',
+              root: 'hover:cursor-pointer',
+            }"
+          >
+            <template #header>
+              <h1 class="text-xl">{{ item?.name }}</h1>
+            </template>
 
-          <p class="text-sm">
-            {{ item?.description || ' There is nothing to desc' }}
-          </p>
-        </UCard>
+            <p class="text-sm">
+              {{ item?.description || 'There is nothing to desc' }}
+            </p>
+          </UCard>
+        </div>
       </UCarousel>
     </div>
 
     <UPageHero
-      v-else
+      v-if="!locations?.data && locations?.data.length === 0"
       title="Don't have any locations ?"
       description="Add a new location to get start your journey now ! "
       :links="links"

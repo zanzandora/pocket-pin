@@ -4,6 +4,7 @@ export type SideBarItem = {
   label: string
   icon: string
   to: string
+  _id?: number
 }
 
 export const useMySidebarStore = defineStore('mySidebarStore', () => {
