@@ -31,12 +31,13 @@ onMounted(() => {
             side: 'top',
             sideOffset: 8,
           }"
+          :open="mapStore.selectedPoint === point"
           :delay-duration="0"
           :text="point.name"
         >
           <div
-            @mouseenter="mapStore.selectedPoint = point"
-            @mouseleave="mapStore.selectedPoint = null"
+            @mouseenter="mapStore.selectedPointWithoutFlyTo(point)"
+            @mouseleave="mapStore.selectedPointWithoutFlyTo(null)"
           >
             <UIcon
               class="cursor-pointer text-2xl"

@@ -1,3 +1,5 @@
+import type { LngLatBounds } from 'maplibre-gl'
+
 import { defineStore } from 'pinia'
 
 import type { MapType } from '~/types/map.type'
@@ -5,6 +7,15 @@ import type { MapType } from '~/types/map.type'
 export const useMyMapStore = defineStore('myMapStore', () => {
   const mapPoints = ref<MapType[]>([])
   const selectedPoint = ref<MapType | null>(null)
+  const shouldFlyTo = ref(true)
+
+  let bounds: LngLatBounds | null = null
+  const padding: number = 60
+
+  function selectedPointWithoutFlyTo(point: MapType | null) {
+    shouldFlyTo.value = false
+    selectedPoint.value = point
+  }
 
   // init function to initialize the map with the first point
   // TODO: Map displays with appropriate zoom level
@@ -15,15 +26,16 @@ export const useMyMapStore = defineStore('myMapStore', () => {
 
     const map = useMap()
 
+    // Compute bounds from points and initially fit
     effect(() => {
       const firstPoint = mapPoints.value[0]
       if (!firstPoint) {
         return
       }
 
-      const bounds = mapPoints.value.reduce(
-        (bounds, point) => {
-          return bounds.extend([point.longitude, point.latitude])
+      bounds = mapPoints.value.reduce(
+        (b, point) => {
+          return b.extend([point.longitude, point.latitude])
         },
         new LngLatBounds(
           [firstPoint.longitude, firstPoint.latitude],
@@ -32,8 +44,30 @@ export const useMyMapStore = defineStore('myMapStore', () => {
       )
 
       map.map?.fitBounds(bounds, {
-        padding: 60,
+        padding,
       })
+    })
+
+    // Control flyTo/fitBounds based on selection and shouldFlyTo flag
+    effect(() => {
+      if (selectedPoint.value && shouldFlyTo.value) {
+        map.map?.flyTo({
+          center: [selectedPoint.value.longitude, selectedPoint.value.latitude],
+          zoom: 2,
+          speed: 1,
+          curve: 1,
+          easing(t) {
+            return t
+          },
+        })
+
+        // Reset flag so next selection can fly unless explicitly disabled
+        shouldFlyTo.value = true
+      } else if (bounds && shouldFlyTo.value) {
+        map.map?.fitBounds(bounds, {
+          padding,
+        })
+      }
     })
   }
 
@@ -41,5 +75,6 @@ export const useMyMapStore = defineStore('myMapStore', () => {
     init,
     mapPoints,
     selectedPoint,
+    selectedPointWithoutFlyTo,
   }
 })
