@@ -35,7 +35,9 @@ onMounted(() => {
         loop
         wheel-gestures
         :items="locations?.data"
-        :ui="{ item: 'basis-1/3' }"
+        :ui="{
+          item: 'basis-1/3',
+        }"
       >
         <div
           :key="item._id"

@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import type { MglEvent } from '@indoorequal/vue-maplibre-gl'
+import type { LngLat } from 'maplibre-gl'
+
 import { CENTER_VI } from '../../libs/constant'
 
 const colorMode = useColorMode()
@@ -11,14 +14,63 @@ const style = computed(() =>
 )
 const zoom = 5
 
+function updateAddedPoint(location: LngLat) {
+  if (mapStore.addedPoint) {
+    mapStore.addedPoint.latitude = location.lat
+    mapStore.addedPoint.longitude = location.lng
+  }
+}
+
+function onDoubleClick(mglEvent: MglEvent<'dblclick'>) {
+  if (mapStore.addedPoint) {
+    mapStore.addedPoint.latitude = mglEvent.event.lngLat.lat
+    mapStore.addedPoint.longitude = mglEvent.event.lngLat.lng
+  }
+}
+
 onMounted(() => {
   mapStore.init()
 })
 </script>
 
 <template>
-  <MglMap :map-style="style" :center="CENTER_VI" :zoom="zoom">
+  <MglMap
+    :map-style="style"
+    :center="CENTER_VI"
+    :zoom="zoom"
+    @map:dblclick="onDoubleClick"
+  >
     <MglNavigationControl />
+
+    <!-- Special Location Mark -->
+    <MglMarker
+      v-if="mapStore.addedPoint"
+      draggable
+      :coordinates="[
+        mapStore.addedPoint.longitude,
+        mapStore.addedPoint.latitude,
+      ]"
+      @update:coordinates="updateAddedPoint"
+    >
+      <template #marker>
+        <UTooltip
+          :content="{
+            align: 'center',
+            side: 'top',
+            sideOffset: 8,
+          }"
+          :open="true"
+          text="Drag to your desired location"
+        >
+          <UIcon
+            class="text-warning cursor-pointer text-2xl"
+            name="i-picon:marker"
+          />
+        </UTooltip>
+      </template>
+    </MglMarker>
+
+    <!-- Location Marks -->
     <MglMarker
       v-for="point in mapStore.mapPoints"
       :key="point._id"
@@ -36,8 +88,8 @@ onMounted(() => {
           :text="point.name"
         >
           <div
-            @mouseenter="mapStore.selectedPointWithoutFlyTo(point)"
-            @mouseleave="mapStore.selectedPointWithoutFlyTo(null)"
+            @mouseenter="mapStore.selectedPoint = point"
+            @mouseleave="mapStore.selectedPoint = point"
           >
             <UIcon
               class="cursor-pointer text-2xl"

@@ -7,15 +7,16 @@ import type { MapType } from '~/types/map.type'
 export const useMyMapStore = defineStore('myMapStore', () => {
   const mapPoints = ref<MapType[]>([])
   const selectedPoint = ref<MapType | null>(null)
-  const shouldFlyTo = ref(true)
+  const addedPoint = ref<MapType | null>(null)
+  // const shouldFlyTo = ref(true)
 
   let bounds: LngLatBounds | null = null
   const padding: number = 60
 
-  function selectedPointWithoutFlyTo(point: MapType | null) {
-    shouldFlyTo.value = false
-    selectedPoint.value = point
-  }
+  // function selectedPointWithoutFlyTo(point: MapType | null) {
+  //   shouldFlyTo.value = false
+  //   selectedPoint.value = point
+  // }
 
   // init function to initialize the map with the first point
   // TODO: Map displays with appropriate zoom level
@@ -28,6 +29,11 @@ export const useMyMapStore = defineStore('myMapStore', () => {
 
     // Compute bounds from points and initially fit
     effect(() => {
+      // Don't fit bounds when there's an addedPoint (in add mode)
+      if (addedPoint.value) {
+        return
+      }
+
       const firstPoint = mapPoints.value[0]
       if (!firstPoint) {
         return
@@ -49,32 +55,57 @@ export const useMyMapStore = defineStore('myMapStore', () => {
     })
 
     // Control flyTo/fitBounds based on selection and shouldFlyTo flag
-    effect(() => {
-      if (selectedPoint.value && shouldFlyTo.value) {
-        map.map?.flyTo({
-          center: [selectedPoint.value.longitude, selectedPoint.value.latitude],
-          zoom: 2,
-          speed: 1,
-          curve: 1,
-          easing(t) {
-            return t
-          },
-        })
+    // effect(() => {
+    //   if (addedPoint.value) return
 
-        // Reset flag so next selection can fly unless explicitly disabled
-        shouldFlyTo.value = true
-      } else if (bounds && shouldFlyTo.value) {
-        map.map?.fitBounds(bounds, {
-          padding,
-        })
-      }
-    })
+    //   if (selectedPoint.value) {
+    //     if (shouldFlyTo.value) {
+    //       map.map?.flyTo({
+    //         center: [
+    //           selectedPoint.value.longitude,
+    //           selectedPoint.value.latitude,
+    //         ],
+    //         zoom: 1,
+    //         speed: 1,
+    //         curve: 1,
+    //         easing(t) {
+    //           return t
+    //         },
+    //       })
+    //     }
+    //     // Reset flag so next selection can fly unless explicitly disabled
+    //     shouldFlyTo.value = true
+    //   }
+    // })
+
+    watch(
+      addedPoint,
+      (newValue, oldValue) => {
+        if (newValue && !oldValue) {
+          // When addedPoint is set (first time), fly to it
+          map.map?.flyTo({
+            center: [newValue.longitude, newValue.latitude],
+            zoom: 10,
+            speed: 2,
+          })
+        } else if (newValue && oldValue) {
+          // When addedPoint coordinates change, fly to new location
+          map.map?.flyTo({
+            center: [newValue.longitude, newValue.latitude],
+            speed: 1,
+          })
+        }
+      },
+      {
+        immediate: true,
+      },
+    )
   }
 
   return {
     init,
     mapPoints,
+    addedPoint,
     selectedPoint,
-    selectedPointWithoutFlyTo,
   }
 })

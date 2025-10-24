@@ -2,13 +2,28 @@
 definePageMeta({
   middleware: 'auth-protect',
 })
+
+const route = useRoute()
+const mapStore = useMyMapStore()
+
+// Reset addedPoint when entering dashboard to ensure map functionality works
+onMounted(() => {
+  if (route.path === '/dashboard') {
+    mapStore.addedPoint = null
+  }
+})
 </script>
 
 <template>
   <UDashboardGroup class="mt-16">
     <DashboardSidebar />
 
-    <div class="flex flex-1 flex-col">
+    <div
+      class="flex flex-1"
+      :class="{
+        'flex-col': route.path !== '/dashboard/add',
+      }"
+    >
       <NuxtPage />
 
       <DashboardMap class="flex-1" />

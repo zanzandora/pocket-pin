@@ -1,3 +1,1 @@
-import type { LngLatLike } from 'maplibre-gl'
-
-export const CENTER_VI = [108, 16] as LngLatLike
+export const CENTER_VI: [number, number] = [108, 16]
