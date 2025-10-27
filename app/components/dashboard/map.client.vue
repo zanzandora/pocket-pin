@@ -89,7 +89,7 @@ onMounted(() => {
         >
           <div
             @mouseenter="mapStore.selectedPoint = point"
-            @mouseleave="mapStore.selectedPoint = point"
+            @mouseleave="mapStore.selectedPoint = null"
           >
             <UIcon
               class="cursor-pointer text-2xl"

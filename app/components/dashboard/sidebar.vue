@@ -30,6 +30,7 @@ const items = computed<NavigationMenuItem[][]>(() => [
     {
       label: 'Map Pin',
       slot: 'map' as const,
+      children: [],
     },
   ],
 ])
@@ -63,7 +64,7 @@ const goTo = (path?: string) => {
         orientation="vertical"
       >
         <template #map>
-          <div class="w-full space-y-1">
+          <div class="max-h-1/2 w-full space-y-1 overflow-y-auto">
             <div
               v-for="child in sidebarStore.sidebarItems.value"
               :key="child._id"

@@ -5,6 +5,8 @@ import type {
 } from '@@/shared/schemas/insert-location'
 import type { FetchError } from 'ofetch'
 
+import type { NominatimLocationsType } from '@/types/map.type'
+
 import { insertLocationSchema } from '../../../../shared/schemas/insert-location'
 import { CENTER_VI } from '../../../libs/constant'
 
@@ -66,7 +68,16 @@ const submitForm = handleSubmit(async (data) => {
     })
   }
 })
-
+function searchResultSelected(result: NominatimLocationsType) {
+  setFieldValue('name', result.name)
+  mapStore.addedPoint = {
+    _id: 1,
+    name: 'Added Point',
+    description: '',
+    longitude: Number(result.lon),
+    latitude: Number(result.lat),
+  }
+}
 function formatLatLon(value: number) {
   if (!value) return
 
@@ -151,16 +162,22 @@ effect(() => {
 
     <!-- Latitude & Longitude -->
     <div>
-      <p class="text-xl">
-        Drag the
-        <UIcon class="text-warning cursor-pointer" name="i-picon:marker" />
-        marker to your desired location.
-      </p>
-      <p>Or double click on the map.</p>
-      <p class="mt-2 text-sm text-gray-400">
+      <p class="-mt-2 text-sm text-gray-400">
         Current Locate: {{ formatLatLon(controlledValues.latitude) }}
         {{ formatLatLon(controlledValues.longitude) }}
       </p>
+      <ul class="my-1 text-xl">
+        To set the coordonates:
+      </ul>
+      <div class="ml-6 text-sm">
+        <li>
+          Drag the
+          <UIcon class="text-warning cursor-pointer" name="i-picon:marker" />
+          marker to your desired location.
+        </li>
+        <li>double click on the map.</li>
+        <li>Search for a location and set it</li>
+      </div>
     </div>
 
     <!-- Buttons -->
@@ -188,4 +205,7 @@ effect(() => {
       </UButton>
     </div>
   </form>
+  <div class="mx-4 flex justify-end">
+    <DashboardAddLocationSearchPlace @results-selected="searchResultSelected" />
+  </div>
 </template>
