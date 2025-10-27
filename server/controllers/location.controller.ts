@@ -1,6 +1,10 @@
 import type { InsertLocationInput } from '~~/shared/schemas/insert-location'
 
+import { customAlphabet } from 'nanoid'
+
 import LocationSchema from '../schemas/location'
+
+const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5)
 
 // TODO: fine location by name
 export async function findLocationByName(
@@ -13,23 +17,26 @@ export async function findLocationByName(
   })
 }
 
+export async function findLocationBySlug(slug: string) {
+  return await LocationSchema.findOne({
+    slug,
+  })
+}
+
 // TODO: get unique slug
 export async function getUniqueSlug(name: string) {
-  let slug = name
-    .toString()
-    .toLowerCase()
-    .trim()
-    .replace(/\W+/g, '-')
-    .replace(/^-+|-+$/g, '')
+  let existing = !!(await findLocationBySlug(name))
 
-  let counter = 1
-
-  // Kiểm tra trùng lặp slug trong database
-  while (await LocationSchema.exists({ slug })) {
-    slug = `${slug}-${counter}`
-    counter++
+  while (existing) {
+    const id = nanoid()
+    const idSlug = `${name}-${id}`
+    existing = !!(await findLocationBySlug(idSlug))
+    if (!existing) {
+      return idSlug
+    }
   }
-  return slug
+
+  return name
 }
 
 // TODO: Insert location

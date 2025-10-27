@@ -1,4 +1,5 @@
 import { insertLocationSchema } from '@@/shared/schemas/insert-location'
+import slugify from 'slug'
 
 import {
   findLocationByName,
@@ -6,7 +7,7 @@ import {
   insertedLocation,
 } from '../controllers/location.controller'
 import connectDB from '../libs/db'
-import { defineAuthenticatedEventHandle } from '../libs/utils'
+import { defineAuthenticatedEventHandle, sendZodError } from '../libs/utils'
 
 export default defineAuthenticatedEventHandle(async (event) => {
   await connectDB()
@@ -14,27 +15,11 @@ export default defineAuthenticatedEventHandle(async (event) => {
   const result = await readValidatedBody(event, insertLocationSchema.safeParse)
 
   if (!result.success) {
-    const statusMessage = result.error.issues
-      .map((issue) => `${issue.path.join('')}: ${issue.message}`)
-      .join('; ')
-
-    const data = result.error.issues.reduce(
-      (errors, issue) => {
-        errors[issue.path.join('')] = issue.message
-        return errors
-      },
-      {} as Record<string, string>,
-    )
-
-    throw createError({
-      statusCode: 422,
-      statusMessage,
-      data,
-    })
+    sendZodError(event, result.error)
   }
 
   const exitedLocation = await findLocationByName(
-    result.data,
+    result.data!,
     event.context.user.id,
   )
 
@@ -45,11 +30,11 @@ export default defineAuthenticatedEventHandle(async (event) => {
     })
   }
 
-  const slug = await getUniqueSlug(result.data.name)
+  const slug = await getUniqueSlug(slugify(result.data!.name))
 
   try {
     const newLocation = await insertedLocation(
-      result.data,
+      result.data!,
       event.context.user.id,
       slug,
     )
