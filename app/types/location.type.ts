@@ -1,3 +1,5 @@
+import type { LocationLogType } from './location-log.type'
+
 export type LocationType = {
   _id?: number
   name: string
@@ -6,4 +8,5 @@ export type LocationType = {
   longitude: number
   userId: string
   slug: string
+  locationLogs?: LocationLogType[]
 }

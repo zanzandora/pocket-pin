@@ -1,3 +1,5 @@
+import type { RouteLocationRaw } from 'vue-router'
+
 export type LatLonItemType = {
   latitude: number
   longitude: number
@@ -7,6 +9,8 @@ export type MapType = {
   _id?: number
   name: string
   description?: string
+  to?: RouteLocationRaw
+  toLabel?: string
 } & LatLonItemType
 
 export type NominatimLocationsType = {

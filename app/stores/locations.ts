@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 import type { ApiResponeType } from '~/types/api-respone.type'
 import type { LocationType } from '~/types/location.type'
+import type { MapType } from '~/types/map.type'
 
 export const useMyLocationsStore = defineStore('myLocationsStore', () => {
   const {
@@ -17,14 +18,28 @@ export const useMyLocationsStore = defineStore('myLocationsStore', () => {
 
   effect(() => {
     if (locations.value?.data) {
-      sidebarStore.sidebarItems = locations.value.data.map((location) => ({
-        label: location?.name ?? 'Unknown',
-        icon: 'i-lucide-map',
-        to: `/`,
-        _id: location._id,
-      }))
+      const mapPoints: MapType[] = []
+      const sidebarItems: SideBarItem[] = []
 
-      mapStore.mapPoints = locations.value.data
+      locations.value.data.forEach((location) => {
+        const mapPoint = createMapPointFromLocation(location)
+        mapPoints.push(mapPoint)
+        sidebarItems.push({
+          label: location?.name ?? 'Unknown',
+          icon: 'i-lucide-map',
+          to: {
+            name: 'dashboard-location-slug',
+            params: { slug: location.slug },
+          },
+          slug: location.slug,
+          _id: location._id,
+          mapPoints: mapPoint,
+        })
+      })
+
+      sidebarStore.sidebarItems = sidebarItems
+
+      mapStore.mapPoints = mapPoints
     }
   })
 

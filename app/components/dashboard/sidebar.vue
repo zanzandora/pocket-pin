@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { NavigationMenuItem } from '@nuxt/ui'
+import type { RouteLocationRaw } from 'vue-router'
 
 const route = useRoute()
 const router = useRouter()
@@ -35,7 +36,7 @@ const items = computed<NavigationMenuItem[][]>(() => [
   ],
 ])
 
-const goTo = (path?: string) => {
+const goTo = (path?: RouteLocationRaw) => {
   if (path) router.push(path)
 }
 </script>
@@ -65,7 +66,7 @@ const goTo = (path?: string) => {
       >
         <template #map>
           <div class="max-h-1/2 w-full space-y-1 overflow-y-auto">
-            <div
+            <NuxtLink
               v-for="child in sidebarStore.sidebarItems.value"
               :key="child._id"
               class="flex min-w-full cursor-pointer items-center gap-2 rounded-md px-3 py-2 transition-colors duration-200"
@@ -73,6 +74,7 @@ const goTo = (path?: string) => {
                 'hover:bg-elevated': mapStore.selectedPoint?._id === child._id,
                 'bg-transparent': mapStore.selectedPoint?._id !== child._id,
               }"
+              :to="child.href || child.to"
               @mouseenter="
                 mapStore.selectedPoint =
                   mapStore.mapPoints.find((point) => point._id === child._id) ||
@@ -93,7 +95,7 @@ const goTo = (path?: string) => {
               <span class="truncate text-sm font-medium">
                 {{ child.label }}
               </span>
-            </div>
+            </NuxtLink>
           </div>
         </template>
       </UNavigationMenu>

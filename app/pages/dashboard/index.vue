@@ -46,25 +46,34 @@ onMounted(() => {
             'border-pink-500': mapStore.selectedPoint?._id === item._id,
             'border-transparent': mapStore.selectedPoint?._id !== item._id,
           }"
-          @mouseenter="mapStore.selectedPoint = item"
+          @mouseenter="
+            mapStore.selectedPoint = createMapPointFromLocation(item)
+          "
           @mouseleave="mapStore.selectedPoint = null"
         >
-          <UCard
-            variant="subtle"
-            :ui="{
-              header: 'sm:px-4 p-2',
-              body: 'sm:px-4 p-2',
-              root: 'hover:cursor-pointer',
+          <NuxtLink
+            :to="{
+              name: 'dashboard-location-slug',
+              params: { slug: item.slug },
             }"
           >
-            <template #header>
-              <h1 class="text-xl">{{ item?.name }}</h1>
-            </template>
+            <UCard
+              variant="subtle"
+              :ui="{
+                header: 'sm:px-4 p-2',
+                body: 'sm:px-4 p-2',
+                root: 'hover:cursor-pointer',
+              }"
+            >
+              <template #header>
+                <h1 class="text-xl">{{ item?.name }}</h1>
+              </template>
 
-            <p class="text-sm">
-              {{ item?.description || 'There is nothing to desc' }}
-            </p>
-          </UCard>
+              <p class="text-sm">
+                {{ item?.description || 'There is nothing to desc' }}
+              </p>
+            </UCard>
+          </NuxtLink>
         </div>
       </UCarousel>
     </div>

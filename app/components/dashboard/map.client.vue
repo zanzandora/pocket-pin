@@ -83,7 +83,7 @@ onMounted(() => {
             side: 'top',
             sideOffset: 8,
           }"
-          :open="mapStore.selectedPoint === point"
+          :open="isPointSelected(point, mapStore.selectedPoint)"
           :delay-duration="0"
           :text="point.name"
         >
@@ -94,7 +94,7 @@ onMounted(() => {
             <UIcon
               class="cursor-pointer text-2xl"
               :class="
-                mapStore.selectedPoint === point
+                isPointSelected(point, mapStore.selectedPoint)
                   ? 'text-pink-500'
                   : 'text-secondary'
               "
@@ -106,6 +106,11 @@ onMounted(() => {
       <MglPopup>
         <h1 class="text-xl">{{ point.name }}</h1>
         <p>{{ point.description || '' }}</p>
+        <div v-if="point.to" class="flex justify-end">
+          <UButton :to="point.to" color="neutral" variant="link" class="pl-0">
+            {{ point.toLabel || 'View' }}
+          </UButton>
+        </div>
       </MglPopup>
     </MglMarker>
   </MglMap>
