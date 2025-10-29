@@ -7,6 +7,7 @@ const connectDB = async () => {
   }
   try {
     await mongoose.connect(env.MONGODB_URI as string)
+    await import('../../schemas')
     console.warn('MongoDB connected')
   } catch (error) {
     console.warn('Error connecting to MongoDB:', error)

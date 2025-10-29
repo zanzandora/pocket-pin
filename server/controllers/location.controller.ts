@@ -2,7 +2,7 @@ import type { InsertLocationInput } from '~~/shared/schemas/insert-location'
 
 import { customAlphabet } from 'nanoid'
 
-import LocationSchema from '../schemas/location'
+import LocationModel from '../schemas/location'
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5)
 
@@ -11,14 +11,14 @@ export async function findLocationByName(
   existing: InsertLocationInput,
   userId: string,
 ) {
-  return await LocationSchema.findOne({
+  return await LocationModel.findOne({
     userId,
     name: existing.name,
   })
 }
 
 export async function findLocationBySlug(slug: string) {
-  return await LocationSchema.findOne({
+  return await LocationModel.findOne({
     slug,
   })
 }
@@ -45,7 +45,7 @@ export async function insertedLocation(
   userId: string,
   slug: string,
 ) {
-  const newLocation = new LocationSchema({
+  const newLocation = new LocationModel({
     ...data,
     userId,
     slug,
@@ -57,9 +57,11 @@ export async function insertedLocation(
 
 // TODO: Get all locations
 export async function getAllLocations(userId: string) {
-  const locations = await LocationSchema.find({ userId }).sort({
-    createdAt: -1,
-  })
+  const locations = await LocationModel.find({ userId })
+    .sort({
+      createdAt: -1,
+    })
+    .populate('locationLogs')
 
   if (locations.length === 0) {
     return { statusCode: 404, success: false, data: [] }
@@ -69,8 +71,8 @@ export async function getAllLocations(userId: string) {
 }
 
 // TODO: Get a location
-export async function findLocation(userId: string) {
-  const location = await LocationSchema.findOne({ userId })
+export async function findLocation(userId: string, slug: string) {
+  const location = await LocationModel.findOne({ userId, slug })
 
   return location
 }

@@ -39,4 +39,15 @@ const locationLogSchema = new Schema(
   { timestamps: true }, // Automatically create createdAt and updatedAt fields});
 )
 
-export default mongoose.model('LocationLog', locationLogSchema)
+const LocationLogModal =
+  (mongoose.models.Location as mongoose.Model<
+    LocationLogDocument,
+    object,
+    object
+  >) || mongoose.model<LocationLogDocument>('LocationLog', locationLogSchema)
+
+export default LocationLogModal
+
+export type LocationLogDocument = mongoose.InferSchemaType<
+  typeof locationLogSchema
+>
