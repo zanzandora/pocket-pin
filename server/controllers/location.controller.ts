@@ -76,3 +76,18 @@ export async function findLocation(userId: string, slug: string) {
 
   return location
 }
+
+// TODO: Update location by slug
+export async function updateLocationBySlug(
+  userId: string,
+  slug: string,
+  data: InsertLocationInput,
+) {
+  const updatedLocation = await LocationModel.findOneAndUpdate(
+    { userId, slug },
+    data,
+    { new: true },
+  )
+
+  return updatedLocation
+}

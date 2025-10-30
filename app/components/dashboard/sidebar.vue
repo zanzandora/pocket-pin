@@ -2,31 +2,28 @@
 import type { NavigationMenuItem } from '@nuxt/ui'
 import type { RouteLocationRaw } from 'vue-router'
 
+import {
+  // CURRENT_LOCATION_LOG_PAGES,
+  CURRENT_LOCATION_PAGES,
+  LOCATION_PAGES,
+} from '../../libs/constant'
+
 const route = useRoute()
 const router = useRouter()
 
 const sidebarStore = storeToRefs(useMySidebarStore())
+const locationsStore = useMyLocationsStore()
+const { currentLocation, currentLocationStatus } = storeToRefs(locationsStore)
 const mapStore = useMyMapStore()
 
 onMounted(() => {
   if (route.path !== '/dashboard') {
-    useMyLocationsStore().refresh()
+    useMyLocationsStore().locationsRefresh()
   }
 })
 
 const items = computed<NavigationMenuItem[][]>(() => [
-  [
-    {
-      label: 'Location',
-      icon: 'i-lucide-house',
-      to: '/dashboard',
-    },
-    {
-      label: 'Add Location',
-      icon: 'i-lucide-inbox',
-      to: '/dashboard/add',
-    },
-  ],
+  sidebarStore.sidebarTopItems.value,
   [
     {
       label: 'Map Pin',
@@ -38,6 +35,139 @@ const items = computed<NavigationMenuItem[][]>(() => [
 
 const goTo = (path?: RouteLocationRaw) => {
   if (path) router.push(path)
+}
+
+// TODO: dynamic sidebar items top based on route
+effect(() => {
+  if (LOCATION_PAGES.has(route.name?.toString() || '')) {
+    sidebarStore.sidebarTopItems.value = [
+      {
+        label: 'Location',
+        icon: 'i-lucide-house',
+        to: '/dashboard',
+      },
+      {
+        label: 'Add Location',
+        icon: 'i-lucide-inbox',
+        to: '/dashboard/add',
+      },
+    ]
+  } else if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || '')) {
+    sidebarStore.sidebarTopItems.value = [
+      {
+        label: 'Back to Locations',
+        to: '/dashboard',
+        icon: 'tabler:arrow-left',
+      },
+    ]
+
+    if (currentLocation.value && currentLocationStatus.value !== 'pending') {
+      sidebarStore.sidebarTopItems.value.push(
+        {
+          label: currentLocation.value.data.name,
+          to: {
+            name: 'dashboard-location-slug',
+            params: {
+              slug: route.params.slug,
+            },
+          },
+          icon: 'tabler:map',
+        },
+        {
+          label: 'Edit Location',
+          to: {
+            name: 'dashboard-location-slug-edit',
+            params: {
+              slug: route.params.slug,
+            },
+          },
+          icon: 'tabler:map-pin-cog',
+        },
+        {
+          label: 'Add Location Log',
+          to: {
+            name: 'dashboard-location-slug-add',
+            params: {
+              slug: route.params.slug,
+            },
+          },
+          icon: 'tabler:circle-plus-filled',
+        },
+      )
+    }
+  }
+  // else if (CURRENT_LOCATION_LOG_PAGES.has(route.name?.toString() || '')) {
+  //   if (currentLocation.value && currentLocationStatus.value !== 'pending') {
+  //     sidebarStore.sidebarTopItems.value = [
+  //       {
+  //         label: `Back to "${currentLocation.value.data.name}"`,
+  //         to: {
+  //           name: 'dashboard-location-slug',
+  //           params: {
+  //             slug: route.params.slug,
+  //           },
+  //         },
+  //         icon: 'tabler:arrow-left',
+  //       },
+  //       {
+  //         label: 'View Log',
+  //         to: {
+  //           name: 'dashboard-location-slug-id',
+  //           params: {
+  //             slug: route.params.slug,
+  //             id: route.params.id,
+  //           },
+  //         },
+  //         icon: 'tabler:map-pin',
+  //       },
+  //       {
+  //         label: 'Edit Log',
+  //         to: {
+  //           name: 'dashboard-location-slug-id-edit',
+  //           params: {
+  //             slug: route.params.slug,
+  //             id: route.params.id,
+  //           },
+  //         },
+  //         icon: 'tabler:map-pin-cog',
+  //       },
+  //       {
+  //         label: 'Manage Images',
+  //         to: {
+  //           name: 'dashboard-location-slug-id-images',
+  //           params: {
+  //             slug: route.params.slug,
+  //             id: route.params.id,
+  //           },
+  //         },
+  //         icon: 'tabler:photo-cog',
+  //       },
+  //     ]
+  //   }
+  // }
+  else {
+    // Fallback to default items for other routes
+    sidebarStore.sidebarTopItems.value = [
+      {
+        label: 'Location',
+        icon: 'i-lucide-house',
+        to: '/dashboard',
+      },
+      {
+        label: 'Add Location',
+        icon: 'i-lucide-inbox',
+        to: '/dashboard/add',
+      },
+    ]
+  }
+})
+
+if (LOCATION_PAGES.has(route.name?.toString() || '')) {
+  await locationsStore.locationsRefresh()
+}
+
+if (CURRENT_LOCATION_PAGES.has(route.name?.toString() || '')) {
+  await locationsStore.currentLocationRefresh()
 }
 </script>
 

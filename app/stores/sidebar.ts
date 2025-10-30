@@ -16,8 +16,21 @@ export type SideBarItem = {
 
 export const useMySidebarStore = defineStore('mySidebarStore', () => {
   const sidebarItems = ref<SideBarItem[]>([])
+  const sidebarTopItems = ref<SideBarItem[]>([
+    {
+      label: 'Location',
+      icon: 'i-lucide-house',
+      to: '/dashboard',
+    },
+    {
+      label: 'Add Location',
+      icon: 'i-lucide-inbox',
+      to: '/dashboard/add',
+    },
+  ])
 
   return {
     sidebarItems,
+    sidebarTopItems,
   }
 })

@@ -1,19 +1,27 @@
 <script lang="ts" setup>
-import type { ApiResponeType } from '../../../types/api-respone.type'
-import type { LocationType } from '../../../types/location.type'
-
 const route = useRoute()
-const { slug } = route.params
 
 const mapStore = useMyMapStore()
-
+const locationStore = useMyLocationsStore()
 const {
-  data: location,
-  status,
-  error,
-} = await useFetch<ApiResponeType<LocationType>>(`/api/location/${slug}`, {
-  lazy: true,
-})
+  currentLocation: location,
+  currentLocationStatus: status,
+  currentLocationError: error,
+} = storeToRefs(locationStore)
+
+watch(
+  () => route.params.slug,
+  (slug) => {
+    if (
+      route.name === 'dashboard-location-slug' &&
+      slug &&
+      slug !== 'undefined'
+    ) {
+      locationStore.currentLocationRefresh()
+    }
+  },
+  { immediate: true },
+)
 
 effect(() => {
   if (location.value) {
@@ -23,10 +31,18 @@ effect(() => {
 </script>
 
 <template>
-  <div class="h-44">
+  <div class="h-44 p-4">
     <div v-if="status === 'pending'">Loading</div>
-    <div v-if="!location?.data">No location found</div>
-    <div v-if="location && status !== 'pending'">
+    <div v-if="!location?.data && location?.data === null">
+      No location found
+    </div>
+    <div
+      v-if="
+        route.name === 'dashboard-location-slug' &&
+        location &&
+        status !== 'pending'
+      "
+    >
       <h1>{{ location.data.name }}</h1>
       <p>{{ location.data.description }}</p>
       <p
@@ -39,9 +55,9 @@ effect(() => {
         type="button"
         variant="outline"
         class="my-2 px-6 py-2"
-        tralling-icon="i-lucide:map-pin-plus"
+        trailing-icon="i-lucide:map-pin-plus"
       >
-        Add locaiton log
+        Add location log
       </UButton>
     </div>
     <div v-if="error && status !== 'pending'" class="text-error">

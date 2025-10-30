@@ -7,17 +7,20 @@ const links = ref([
   },
 ])
 
-const { locations, status } = storeToRefs(useMyLocationsStore())
+const { locations, locationsStatus } = storeToRefs(useMyLocationsStore())
 const mapStore = useMyMapStore()
 
 onMounted(() => {
-  useMyLocationsStore().refresh()
+  useMyLocationsStore().locationsRefresh()
 })
 </script>
 
 <template>
-  <UMain class="min-h-auto mx-2 my-4">
-    <div v-if="status === 'pending'" class="flex flex-col gap-6 sm:flex-row">
+  <div class="h-44 p-4">
+    <div
+      v-if="locationsStatus === 'pending'"
+      class="flex flex-col gap-6 sm:flex-row"
+    >
       <USkeleton
         v-for="i in 3"
         :key="i"
@@ -27,7 +30,9 @@ onMounted(() => {
 
     <div
       v-if="
-        status !== 'pending' && locations?.data && locations?.data.length > 0
+        locationsStatus !== 'pending' &&
+        locations?.data &&
+        locations?.data.length > 0
       "
     >
       <UCarousel
@@ -85,5 +90,5 @@ onMounted(() => {
       :links="links"
       :ui="{ title: 'text-4xl sm:text-6xl' }"
     />
-  </UMain>
+  </div>
 </template>
