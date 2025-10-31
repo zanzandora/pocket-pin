@@ -17,7 +17,7 @@
           </p>
         </div>
         <!-- Add Inputs -->
-        <DashboardAddLocationAddForm class="mt-4" />
+        <DashboardFormsAddForm class="mt-4" />
       </div>
     </UContainer>
   </u-dashboard-panel>

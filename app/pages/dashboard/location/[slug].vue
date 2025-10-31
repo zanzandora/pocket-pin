@@ -9,38 +9,41 @@ const {
   currentLocationError: error,
 } = storeToRefs(locationStore)
 
-watch(
-  () => route.params.slug,
-  (slug) => {
-    if (
-      route.name === 'dashboard-location-slug' &&
-      slug &&
-      slug !== 'undefined'
-    ) {
-      locationStore.currentLocationRefresh()
-    }
-  },
-  { immediate: true },
-)
-
 effect(() => {
   if (location.value) {
     mapStore.mapPoints = [location.value.data]
+  }
+})
+
+onMounted(() => {
+  locationStore.currentLocationRefresh()
+})
+
+onBeforeRouteUpdate((to) => {
+  if (to.name === 'dashboard-location-slug') {
+    locationStore.currentLocationRefresh()
   }
 })
 </script>
 
 <template>
   <div class="h-44 p-4">
-    <div v-if="status === 'pending'">Loading</div>
+    <div
+      v-if="status === 'pending' && route.name === 'dashboard-location-slug'"
+    >
+      Loading
+    </div>
     <div v-if="!location?.data && location?.data === null">
       No location found
+    </div>
+    <div v-if="error && status !== 'pending'" class="text-error">
+      {{ error.statusMessage }}
     </div>
     <div
       v-if="
         route.name === 'dashboard-location-slug' &&
-        location &&
-        status !== 'pending'
+          location &&
+          status !== 'pending'
       "
     >
       <h1>{{ location.data.name }}</h1>
@@ -60,8 +63,9 @@ effect(() => {
         Add location log
       </UButton>
     </div>
-    <div v-if="error && status !== 'pending'" class="text-error">
-      {{ error.statusMessage }}
+
+    <div v-if="route.name !== 'dashboard-location-slug'">
+      <NuxtPage />
     </div>
   </div>
 </template>

@@ -1,38 +1,44 @@
 <script setup lang="ts">
-import type {
-  InsertLocationInput,
-  insertLocationResponse,
-} from '@@/shared/schemas/insert-location'
+import type { InsertLocationInput } from '@@/shared/schemas/insert-location'
 import type { FetchError } from 'ofetch'
 
 import type { NominatimLocationsType } from '@/types/map.type'
 
-import { insertLocationSchema } from '../../../../shared/schemas/insert-location'
-import { CENTER_VI } from '../../../libs/constant'
+import { insertLocationSchema } from '../../../shared/schemas/insert-location'
+import { CENTER_VI } from '../../libs/constant'
 
-const toast = useToast()
+const props = defineProps<{
+  initialValues?: InsertLocationInput | null
+  onSubmit: (location: InsertLocationInput) => Promise<any>
+  isEditMode?: boolean
+  submitButtonText?: string
+  submitButtonIcon?: string
+  showCancelButton?: boolean
+  cancelRoute?: string
+}>()
+
 const router = useRouter()
+const route = useRoute()
+const toast = useToast()
 
 const mapStore = useMyMapStore()
-// Protect from CSRF attack
-const { $csrfFetch } = useNuxtApp()
 
 const {
   handleSubmit,
-  resetForm,
   defineField,
   errors,
   meta,
   isSubmitting,
   setFieldValue,
   controlledValues,
+  resetForm,
 } = useForm<InsertLocationInput>({
   validationSchema: toTypedSchema(insertLocationSchema),
   initialValues: {
-    name: '',
-    description: '',
-    longitude: CENTER_VI[0],
-    latitude: CENTER_VI[1],
+    name: props.initialValues?.name || '',
+    description: props.initialValues?.description || '',
+    longitude: props.initialValues?.longitude || CENTER_VI[0],
+    latitude: props.initialValues?.latitude || CENTER_VI[1],
   },
 })
 
@@ -42,21 +48,34 @@ const [description, descriptionAttrs] = defineField('description')
 
 const submitForm = handleSubmit(async (data) => {
   try {
-    await $csrfFetch<insertLocationResponse>('/api/location', {
-      method: 'POST',
-      body: data,
-    })
-    // console.log('data: ', inserted)
+    await props.onSubmit(data)
 
     toast.add({
-      title: 'Create location successfully!',
-      description: 'Your new location has been added.',
-      icon: 'check_circle',
+      title: `${
+        props.isEditMode ? 'Location updated' : 'Location added'
+      } successfully!`,
+      description: `The location "${
+        data.name
+      }" has been ${props.isEditMode ? 'updated' : 'added'} successfully.`,
+      icon: 'lucide:check-check',
+      close: {
+        color: 'primary',
+        variant: 'outline',
+        class: 'rounded-full',
+      },
     })
 
     resetForm()
 
-    await router.push('/dashboard')
+    // nếu không có initaionValue thì navigateTo dashboard, có thì navigateTo dashboard-location-slug với parama slug
+    if (!props.initialValues) {
+      router.push('/dashboard')
+    } else {
+      router.push({
+        name: 'dashboard-location-slug',
+        params: { slug: route.params.slug },
+      })
+    }
   } catch (error) {
     const err = error as FetchError
     console.error('Error inserting location:', error)
@@ -64,10 +83,17 @@ const submitForm = handleSubmit(async (data) => {
       title: 'Error',
       description:
         err.data?.statusMessage || err.statusMessage || 'An error occurred.',
-      color: 'error',
+      close: {
+        color: 'error',
+        variant: 'outline',
+        class: 'rounded-full',
+      },
     })
+    // Re-throw error to prevent form reset on failure
+    throw error
   }
 })
+
 function searchResultSelected(result: NominatimLocationsType) {
   setFieldValue('name', result.name)
   mapStore.addedPoint = {
@@ -78,18 +104,27 @@ function searchResultSelected(result: NominatimLocationsType) {
     latitude: Number(result.lat),
   }
 }
+
 function formatLatLon(value: number) {
   if (!value) return
-
   return value.toFixed(5)
 }
+
+function handleCancel() {
+  if (props.cancelRoute) {
+    router.push(props.cancelRoute)
+  } else {
+    router.push('/dashboard')
+  }
+}
+
 onMounted(() => {
   mapStore.addedPoint = {
     _id: 1,
     name: 'Added Point',
     description: '',
-    longitude: CENTER_VI[0],
-    latitude: CENTER_VI[1],
+    longitude: props.initialValues?.longitude || CENTER_VI[0],
+    latitude: props.initialValues?.latitude || CENTER_VI[1],
   }
 })
 
@@ -183,12 +218,13 @@ effect(() => {
     <!-- Buttons -->
     <div class="flex flex-row items-center justify-end gap-4">
       <UButton
+        v-if="showCancelButton !== false"
         type="button"
         variant="outline"
         class="px-6 py-2"
         icon="i-lucide:corner-up-left"
         :disabled="isSubmitting"
-        @click="router.push('/dashboard')"
+        @click="handleCancel"
       >
         Cancel
       </UButton>
@@ -196,16 +232,16 @@ effect(() => {
         type="submit"
         color="primary"
         class="px-6 py-2"
-        trailing-icon="i-lucide:circle-plus"
+        :trailing-icon="submitButtonIcon || 'i-lucide:circle-plus'"
         :disabled="isSubmitting"
         :loading="isSubmitting"
         :trailing="true"
       >
-        Add Location
+        {{ submitButtonText || 'Add Location' }}
       </UButton>
     </div>
   </form>
   <div class="mx-4 flex justify-end">
-    <DashboardAddLocationSearchPlace @results-selected="searchResultSelected" />
+    <DashboardFormsSearchPlace @results-selected="searchResultSelected" />
   </div>
 </template>

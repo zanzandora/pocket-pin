@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { EDIT_PAGES } from '../libs/constant'
+
 definePageMeta({
   middleware: 'auth-protect',
 })
@@ -6,7 +8,7 @@ definePageMeta({
 const route = useRoute()
 const mapStore = useMyMapStore()
 
-const isAddPage = computed(() => route.name === 'dashboard-add')
+const isAddPage = computed(() => !EDIT_PAGES.has(route.name?.toString() || ''))
 
 // Reset addedPoint when entering dashboard to ensure map functionality works
 onMounted(() => {
@@ -20,7 +22,7 @@ onMounted(() => {
   <UDashboardGroup class="mt-16">
     <DashboardSidebar />
 
-    <div class="flex flex-1" :class="isAddPage ? '' : 'flex-col'">
+    <div class="flex flex-1" :class="isAddPage ? 'flex-col' : ''">
       <NuxtPage />
 
       <DashboardMap class="flex-1" />
