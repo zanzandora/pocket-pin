@@ -91,3 +91,10 @@ export async function updateLocationBySlug(
 
   return updatedLocation
 }
+
+// TODO: delete location by slug
+export async function deleteLocationBySlug(userId: string, slug: string) {
+  const deletedLocaiton = await LocationModel.deleteOne({ userId, slug })
+
+  return deletedLocaiton
+}

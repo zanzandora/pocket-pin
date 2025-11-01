@@ -33,12 +33,15 @@ onBeforeRouteUpdate((to) => {
     >
       Loading
     </div>
+
     <div v-if="!location?.data && location?.data === null">
       No location found
     </div>
+
     <div v-if="error && status !== 'pending'" class="text-error">
       {{ error.statusMessage }}
     </div>
+
     <div
       v-if="
         route.name === 'dashboard-location-slug' &&
@@ -46,7 +49,10 @@ onBeforeRouteUpdate((to) => {
           status !== 'pending'
       "
     >
-      <h1>{{ location.data.name }}</h1>
+      <div class="flex">
+        <h1>{{ location.data.name }}</h1>
+        <DashboardLocationDropdownMenu class="mx-4" />
+      </div>
       <p>{{ location.data.description }}</p>
       <p
         v-if="!location.data?.locationLogs?.length"
