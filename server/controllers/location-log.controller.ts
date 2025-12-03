@@ -1,21 +1,23 @@
-import type { InsertLocationInput } from '~~/shared/schemas/insert-location'
+import type { InsertLocationLogInput } from '~~/shared/schemas/insert-location-log'
+import type { Types } from 'mongoose'
 
 import { customAlphabet } from 'nanoid'
 
 import LocationModel from '../schemas/location'
+import LocationLogModal from '../schemas/location-log'
 
 const nanoid = customAlphabet('1234567890abcdefghijklmnopqrstuvwxyz', 5)
 
-// TODO: fine location by name
-export async function findLocationByName(
-  existing: InsertLocationInput,
-  userId: string,
-) {
-  return await LocationModel.findOne({
-    userId,
-    name: existing.name,
-  })
-}
+// TODO: fine location log by name
+// export async function findLocationByName(
+//   existing: InsertLocationInput,
+//   userId: string,
+// ) {
+//   return await LocationModel.findOne({
+//     userId,
+//     name: existing.name,
+//   })
+// }
 
 export async function findLocationBySlug(slug: string) {
   return await LocationModel.findOne({
@@ -39,23 +41,23 @@ export async function getUniqueSlug(name: string) {
   return name
 }
 
-// TODO: Insert location
-export async function insertedLocation(
-  data: InsertLocationInput,
+// TODO: Insert location log
+export async function insertedLocationLog(
+  data: InsertLocationLogInput,
+  locationId: Types.ObjectId,
   userId: string,
-  slug: string,
 ) {
-  const newLocation = new LocationModel({
+  const newLocationLog = new LocationLogModal({
     ...data,
+    location: locationId,
     userId,
-    slug,
   })
-  await newLocation.save()
+  await newLocationLog.save()
 
-  return newLocation
+  return newLocationLog
 }
 
-// TODO: Get all locations
+// TODO: Get all location logs
 export async function getAllLocations(userId: string) {
   const locations = await LocationModel.find({ userId })
     .sort({
@@ -70,31 +72,29 @@ export async function getAllLocations(userId: string) {
   return locations
 }
 
-// TODO: Get a location
+// TODO: Get a location log
 export async function findLocation(userId: string, slug: string) {
-  const location = await LocationModel.findOne({ userId, slug }).populate(
-    'locationLogs',
-  )
+  const location = await LocationModel.findOne({ userId, slug })
 
   return location
 }
 
 // TODO: Update location by slug
-export async function updateLocationBySlug(
-  userId: string,
-  slug: string,
-  data: InsertLocationInput,
-) {
-  const updatedLocation = await LocationModel.findOneAndUpdate(
-    { userId, slug },
-    data,
-    { new: true },
-  )
+// export async function updateLocationBySlug(
+//   userId: string,
+//   slug: string,
+//   data: InsertLocationInput,
+// ) {
+//   const updatedLocation = await LocationModel.findOneAndUpdate(
+//     { userId, slug },
+//     data,
+//     { new: true },
+//   )
 
-  return updatedLocation
-}
+//   return updatedLocation
+// }
 
-// TODO: delete location by slug
+// TODO: delete location log by slug
 export async function deleteLocationBySlug(userId: string, slug: string) {
   const deletedLocaiton = await LocationModel.deleteOne({ userId, slug })
 

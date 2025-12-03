@@ -54,20 +54,21 @@ onBeforeRouteUpdate((to) => {
         <DashboardLocationDropdownMenu class="mx-4" />
       </div>
       <p>{{ location.data.description }}</p>
-      <p
-        v-if="!location.data?.locationLogs?.length"
-        class="mt-4 text-sm italic"
-      >
-        Add a location log to get start
-      </p>
-      <UButton
-        type="button"
-        variant="outline"
-        class="my-2 px-6 py-2"
-        trailing-icon="i-lucide:map-pin-plus"
-      >
-        Add location log
-      </UButton>
+      <div v-if="!location.data?.locationLogs?.length">
+        <p class="mt-4 text-sm italic">Add a location log to get start</p>
+        <UButton
+          type="button"
+          variant="outline"
+          class="my-2 px-6 py-2"
+          trailing-icon="i-lucide:map-pin-plus"
+          :to="{
+            name: 'dashboard-location-slug-add',
+            params: { slug: route.params.slug },
+          }"
+        >
+          Add location log
+        </UButton>
+      </div>
     </div>
 
     <div v-if="route.name !== 'dashboard-location-slug'">

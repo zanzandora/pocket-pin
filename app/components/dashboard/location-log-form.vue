@@ -1,61 +1,81 @@
 <script setup lang="ts">
-import type { InsertLocationInput } from '@@/shared/schemas/insert-location'
+import type { InsertLocationLogInput } from '~~/shared/schemas/insert-location-log'
 import type { FetchError } from 'ofetch'
 
-import type { NominatimLocationsType } from '@/types/map.type'
+import { insertLocationLogSchema } from '~~/shared/schemas/insert-location-log'
 
-import { insertLocationSchema } from '../../../shared/schemas/insert-location'
 import { CENTER_VI } from '../../libs/constant'
 
 const props = defineProps<{
-  initialValues?: InsertLocationInput | null
-  onSubmit: (location: InsertLocationInput) => Promise<any>
+  initialValues?: InsertLocationLogInput | null
+  onSubmit: (location: InsertLocationLogInput) => Promise<any>
   isEditMode?: boolean
   submitButtonText?: string
   submitButtonIcon?: string
   showCancelButton?: boolean
   cancelRoute?: string
 }>()
+const { currentLocation } = useMyLocationsStore()
+console.log('currentLocation :>> ', currentLocation)
+const mapStore = useMyMapStore()
 
 const router = useRouter()
 const toast = useToast()
 
-const mapStore = useMyMapStore()
-
 const {
   handleSubmit,
-  defineField,
+  setFieldValue,
   errors,
   meta,
   isSubmitting,
-  setFieldValue,
   controlledValues,
   resetForm,
-} = useForm<InsertLocationInput>({
-  validationSchema: toTypedSchema(insertLocationSchema),
+  defineField,
+} = useForm({
+  validationSchema: toTypedSchema(insertLocationLogSchema),
   initialValues: {
     name: props.initialValues?.name || '',
     description: props.initialValues?.description || '',
-    longitude: props.initialValues?.longitude || CENTER_VI[0],
-    latitude: props.initialValues?.latitude || CENTER_VI[1],
+    started_at: props.initialValues?.started_at || '',
+    ended_at: props.initialValues?.ended_at || '',
+    longitude: currentLocation?.data.longitude || CENTER_VI[0],
+    latitude: currentLocation?.data.latitude || CENTER_VI[1],
+    ...props.initialValues,
   },
 })
 
 // Define fields với two-way binding
 const [name, nameAttrs] = defineField('name')
 const [description, descriptionAttrs] = defineField('description')
+const [started_at, _started_atAttrs] = defineField('started_at')
+const [ended_at, _ended_atAttrs] = defineField('ended_at')
+
+function formatLatLon(value: number) {
+  if (!value) return
+  return value.toFixed(5)
+}
+
+// Computed property cho date range binding
+const dateRange = computed({
+  get() {
+    return {
+      start: started_at.value || undefined,
+      end: ended_at.value || undefined,
+    }
+  },
+  set(newValue: { start: string | undefined; end: string | undefined }) {
+    started_at.value = newValue.start || ''
+    ended_at.value = newValue.end || ''
+  },
+})
 
 const submitForm = handleSubmit(async (data) => {
   try {
     await props.onSubmit(data)
 
     toast.add({
-      title: `${
-        props.isEditMode ? 'Location updated' : 'Location added'
-      } successfully!`,
-      description: `The location "${
-        data.name
-      }" has been ${props.isEditMode ? 'updated' : 'added'} successfully.`,
+      title: `${props.isEditMode ? 'Location Log updated' : 'Location Log added'} successfully!`,
+      description: `The location log "${data.name}" has been ${props.isEditMode ? 'updated' : 'added'} successfully.`,
       icon: 'lucide:check-check',
       close: {
         color: 'primary',
@@ -68,13 +88,13 @@ const submitForm = handleSubmit(async (data) => {
     resetForm()
     await nextTick()
 
-    // Reset addedPoint before navigation
     mapStore.addedPoint = null
 
+    // Navigate based on edit mode
     handleCancel()
   } catch (error) {
     const err = error as FetchError
-    console.error('Error inserting location:', error)
+    console.error('Error submitting location log:', error)
     toast.add({
       title: 'Error',
       description:
@@ -90,22 +110,6 @@ const submitForm = handleSubmit(async (data) => {
   }
 })
 
-function searchResultSelected(result: NominatimLocationsType) {
-  setFieldValue('name', result.name)
-  mapStore.addedPoint = {
-    _id: 1,
-    name: 'Added Point',
-    description: '',
-    longitude: Number(result.lon),
-    latitude: Number(result.lat),
-  }
-}
-
-function formatLatLon(value: number) {
-  if (!value) return
-  return value.toFixed(5)
-}
-
 function handleCancel() {
   if (props.cancelRoute) {
     router.push(props.cancelRoute)
@@ -119,13 +123,13 @@ onMounted(() => {
     _id: 1,
     name: 'Added Point',
     description: '',
-    longitude: props.initialValues?.longitude || CENTER_VI[0],
-    latitude: props.initialValues?.latitude || CENTER_VI[1],
+    longitude: currentLocation?.data.longitude || CENTER_VI[0],
+    latitude: currentLocation?.data.latitude || CENTER_VI[1],
     zoom: 6,
   }
 })
 
-onBeforeRouteLeave((to) => {
+onBeforeRouteLeave(() => {
   if (meta.value.dirty && !isSubmitting.value) {
     // eslint-disable-next-line no-alert
     const answer = window.confirm(
@@ -134,11 +138,6 @@ onBeforeRouteLeave((to) => {
     if (!answer) {
       return false
     }
-  }
-
-  // Reset addedPoint when leaving add page to restore map functionality
-  if (to.path !== '/dashboard/add') {
-    mapStore.addedPoint = null
   }
 
   return true
@@ -192,11 +191,19 @@ effect(() => {
       errors.description
     }}</span>
 
-    <!-- Latitude & Longitude -->
+    <!-- Date Range -->
+    <DashboardDateRangePickerInput v-model="dateRange" />
+    <span v-if="errors.started_at" class="-mt-4 text-xs text-red-500">{{
+      errors.started_at
+    }}</span>
+    <span v-if="errors.ended_at" class="-mt-4 text-xs text-red-500">{{
+      errors.ended_at
+    }}</span>
+
     <div>
       <p class="-mt-2 text-sm text-gray-400">
-        Current Locate: {{ formatLatLon(controlledValues.latitude) }}
-        {{ formatLatLon(controlledValues.longitude) }}
+        Current Locate: {{ formatLatLon(controlledValues.latitude!) }}
+        {{ formatLatLon(controlledValues.longitude!) }}
       </p>
       <ul class="my-1 text-xl">
         To set the coordonates:
@@ -234,11 +241,8 @@ effect(() => {
         :loading="isSubmitting"
         :trailing="true"
       >
-        {{ submitButtonText || 'Add Location' }}
+        {{ submitButtonText || 'Add Location Log' }}
       </UButton>
     </div>
   </form>
-  <div class="mx-4 flex justify-end">
-    <DashboardFormsSearchPlace @results-selected="searchResultSelected" />
-  </div>
 </template>

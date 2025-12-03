@@ -30,7 +30,7 @@ const handleSubmit = async (data: InsertLocationInput) => {
     submit-button-text="Update Location"
     submit-button-icon="i-lucide:save"
     :show-cancel-button="true"
-    cancel-route="/dashboard"
+    :cancel-route="`/dashboard/location/${locationId}`"
     :is-edit-mode="true"
   />
 </template>

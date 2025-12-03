@@ -7,11 +7,12 @@ const links = ref([
   },
 ])
 
-const { locations, locationsStatus } = storeToRefs(useMyLocationsStore())
+const locationStore = useMyLocationsStore()
+const { locations, locationsStatus } = storeToRefs(locationStore)
 const mapStore = useMyMapStore()
 
 onMounted(() => {
-  useMyLocationsStore().locationsRefresh()
+  locationStore.locationsRefresh()
 })
 </script>
 
@@ -31,8 +32,8 @@ onMounted(() => {
     <div
       v-if="
         locationsStatus !== 'pending' &&
-        locations?.data &&
-        locations?.data.length > 0
+          locations?.data &&
+          locations?.data.length > 0
       "
     >
       <UCarousel

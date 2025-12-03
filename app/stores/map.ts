@@ -7,7 +7,7 @@ import type { MapType } from '~/types/map.type'
 export const useMyMapStore = defineStore('myMapStore', () => {
   const mapPoints = ref<MapType[]>([])
   const selectedPoint = ref<MapType | null>(null)
-  const addedPoint = ref<MapType | null>(null)
+  const addedPoint = ref<(MapType & { zoom?: number }) | null>(null)
   // const shouldFlyTo = ref(true)
 
   let bounds: LngLatBounds | null = null
@@ -86,7 +86,7 @@ export const useMyMapStore = defineStore('myMapStore', () => {
           // When addedPoint is set (first time), fly to it
           map.map?.flyTo({
             center: [newValue.longitude, newValue.latitude],
-            zoom: 10,
+            zoom: newValue.zoom || 6,
             speed: 2,
           })
         } else if (newValue && oldValue) {
@@ -94,6 +94,7 @@ export const useMyMapStore = defineStore('myMapStore', () => {
           map.map?.flyTo({
             center: [newValue.longitude, newValue.latitude],
             speed: 1,
+            zoom: newValue.zoom || 10,
           })
         }
       },
