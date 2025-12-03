@@ -72,9 +72,10 @@ export async function getAllLocations(userId: string) {
 
 // TODO: Get a location
 export async function findLocation(userId: string, slug: string) {
-  const location = await LocationModel.findOne({ userId, slug }).populate(
-    'locationLogs',
-  )
+  const location = await LocationModel.findOne({ userId, slug }).populate({
+    path: 'locationLogs',
+    options: { sort: { start_at: 1 } },
+  })
 
   return location
 }

@@ -9,7 +9,6 @@ const links = ref([
 
 const locationStore = useMyLocationsStore()
 const { locations, locationsStatus } = storeToRefs(locationStore)
-const mapStore = useMyMapStore()
 
 onMounted(() => {
   locationStore.locationsRefresh()
@@ -45,42 +44,10 @@ onMounted(() => {
           item: 'basis-1/3',
         }"
       >
-        <div
+        <DashboardLocationCarouselCards
           :key="item._id"
-          class="rounded-lg border-2 transition-colors duration-200"
-          :class="{
-            'border-pink-500': mapStore.selectedPoint?._id === item._id,
-            'border-transparent': mapStore.selectedPoint?._id !== item._id,
-          }"
-          @mouseenter="
-            mapStore.selectedPoint = createMapPointFromLocation(item)
-          "
-          @mouseleave="mapStore.selectedPoint = null"
-        >
-          <NuxtLink
-            :to="{
-              name: 'dashboard-location-slug',
-              params: { slug: item.slug },
-            }"
-          >
-            <UCard
-              variant="subtle"
-              :ui="{
-                header: 'sm:px-4 p-2',
-                body: 'sm:px-4 p-2',
-                root: 'hover:cursor-pointer',
-              }"
-            >
-              <template #header>
-                <h1 class="text-xl">{{ item?.name }}</h1>
-              </template>
-
-              <p class="text-sm">
-                {{ item?.description || 'There is nothing to desc' }}
-              </p>
-            </UCard>
-          </NuxtLink>
-        </div>
+          :map-point="createMapPointFromLocation(item)"
+        />
       </UCarousel>
     </div>
 

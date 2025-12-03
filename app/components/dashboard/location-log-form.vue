@@ -16,7 +16,6 @@ const props = defineProps<{
   cancelRoute?: string
 }>()
 const { currentLocation } = useMyLocationsStore()
-console.log('currentLocation :>> ', currentLocation)
 const mapStore = useMyMapStore()
 
 const router = useRouter()
